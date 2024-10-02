@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Search Fundraisers</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f8f0;
+        color: #333;
+        margin: 0;
+        padding: 0;
+      }
+
+      nav {
+        background-color: #4caf50;
+        padding: 15px;
+        text-align: center;
+      }
+
+      nav a {
+        color: white;
+        text-decoration: none;
+        margin: 0 15px;
+        font-size: 18px;
+      }
+
+      nav a:hover {
+        text-decoration: underline;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 30px auto;
+        padding: 20px;
+      }
+
+      h2 {
+        color: #4caf50;
+        font-size: 24px;
+        margin-bottom: 20px;
+      }
+
+      form {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-bottom: 30px;
+      }
+
+      form div {
+        flex: 1;
+        min-width: 200px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+
+      input,
+      select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        box-sizing: border-box;
+        font-size: 16px;
+      }
+
+      button {
+        background-color: #4caf50;
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+      button:hover {
+        background-color: #388e3c;
+      }
+
+      .card {
+        background-color: white;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-bottom: 20px;
+        transition: box-shadow 0.3s ease;
+      }
+
+      h5 {
+        color: #4caf50;
+        font-size: 20px;
+        margin-bottom: 10px;
+      }
+
+      p {
+        font-size: 14px;
+        color: #666;
+      }
+
+      .error {
+        color: red;
+        font-size: 16px;
+        margin-top: 20px;
+      }
+
+      .card a {
+        color: #4caf50;
+        text-decoration: none;
+        font-weight: bold;
+      }
+
+      .card a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="search.html">Search Fundraisers</a>
+    </nav>
+
+    <div class="container">
+      <div>
+        <h2>Search for Fundraisers</h2>
+      </div>
+
+      <form id="searchForm">
+        <div>
+          <label for="organizer">Organizer</label>
+          <input
+            type="text"
+            id="organizer"
+            placeholder="Enter organizer name"
+          />
+        </div>
+        <div>
+          <label for="city">City</label>
+          <input type="text" id="city" placeholder="Enter city" />
+        </div>
+        <div>
+          <label for="category">Category</label>
+          <select id="category">
+            <option value="">Choose category</option>
+            <option value="1">Medical</option>
+            <option value="2">Education</option>
+            <option value="3">Social Impact</option>
+          </select>
+        </div>
+        <button type="submit">Search</button>
+      </form>
+
+      <div id="resultsRow"></div>
+    </div>
+
+    <script>
+      //Executed after the page has loaded, sets up an event listener to handle form submissions.
+      document.addEventListener("DOMContentLoaded", function () {
+        document
+          .getElementById("searchForm")
+          .addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const organizer = document.getElementById("organizer").value;
+            const city = document.getElementById("city").value;
+            const category = document.getElementById("category").value;
+            //Initiate a fetch request ,Use the fetch API to send an HTTP request to the backend for information about eligible fundraisers.
+            fetch(
+              `http://localhost:3333/search?organizer=${organizer}&city=${city}&category=${category}`
+            )
+              .then((response) => {
+                //If the response is normal, call response.json() to get the data.
+                if (!response.ok) {
+                  throw new Error("Network response was not ok");
+                }
+                return response.json();
+              })
+              .then((data) => {
+                //Empty the results area and then generate the appropriate HTML structure based on the returned data to display the search results in the results area.
+                const resultsRow = document.getElementById("resultsRow");
+                resultsRow.innerHTML = "";
+
+                if (data.length === 0) {
+                  resultsRow.innerHTML =
+                    "<div class='error'>No fundraisers found matching your criteria.</div>";
+                  return;
+                }
+
+                data.forEach((fundraiser) => {
+                  const fundraiserCard = `
+                  <div class="card">
+                    <div>
+                      <h5>${fundraiser.title}</h5>
+                      <p>
+                        <strong>Organizer:</strong> ${fundraiser.organizer} <br>
+                        <strong>City:</strong> ${fundraiser.city} <br>
+                        <strong>Target Funding:</strong> $${fundraiser.target_funding} <br>
+                        <strong>Current Funding:</strong> $${fundraiser.current_funding}
+                      </p>
+                      <a href="detail.html?id=${fundraiser.fundraiser_id}">View Details</a>
+                    </div>
+                  </div>
+                `;
+                  resultsRow.innerHTML += fundraiserCard;
+                });
+              })
+              .catch((err) => {
+                document.getElementById("resultsRow").innerHTML =
+                  '<div class="error">No matching fundraisers found</div>';
+                console.error("Error fetching fundraisers:", err);
+              });
+          });
+      });
+    </script>
+  </body>
+</html>

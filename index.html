@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fundraising Platform</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f8f0;
+        color: #333;
+        margin: 0;
+        padding: 0;
+      }
+
+      nav {
+        background-color: #4caf50;
+        padding: 15px;
+        text-align: center;
+      }
+
+      nav a {
+        color: white;
+        text-decoration: none;
+        margin: 0 15px;
+        font-size: 18px;
+      }
+
+      nav a:hover {
+        text-decoration: underline;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 30px auto;
+        padding: 20px;
+      }
+
+      .text-center {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      h2 {
+        color: #388e3c;
+      }
+
+      p {
+        font-size: 16px;
+        line-height: 1.5;
+      }
+
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+      }
+
+      .card {
+        background-color: white;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin: 15px;
+        width: calc(33% - 40px);
+        box-sizing: border-box;
+        transition: box-shadow 0.3s ease;
+      }
+
+      .card h5 {
+        font-size: 20px;
+        margin: 0 0 15px;
+        color: #4caf50;
+      }
+
+      .card p {
+        font-size: 14px;
+        color: #666;
+      }
+
+      .card .btn {
+        display: inline-block;
+        background-color: #4caf50;
+        color: white;
+        padding: 10px 15px;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 5px;
+        margin-top: 10px;
+      }
+
+      .card .btn:hover {
+        background-color: #388e3c;
+      }
+
+      @media (max-width: 768px) {
+        .card {
+          width: calc(50% - 40px);
+        }
+      }
+
+      @media (max-width: 480px) {
+        .card {
+          width: calc(100% - 40px);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <a href="#">Home</a>
+      <a href="search.html">Search Fundraisers</a>
+    </nav>
+
+    <div class="container">
+      <div class="text-center">
+        <h2>Welcome to Our Fundraising Platform</h2>
+        <p>Help raise funds for important causes and make a difference.</p>
+      </div>
+
+      <div id="fundraisersRow" class="row"></div>
+    </div>
+    
+    <script>
+      //Use the DOMContentLoaded event to ensure that the code is executed after the DOM is fully loaded
+      document.addEventListener("DOMContentLoaded", function () {
+        //Use the fetch API to request fundraiser data from a local server
+        fetch("http://localhost:3333/fundraisers")
+        //Check whether the response was successful. If unsuccessful, throw an error. If successful, the returned JSON data is parsed
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Network response was not ok");
+            }
+            return response.json();
+          })
+          //Process the parsed data.
+          .then((data) => {
+            //Get a reference to fundraisersRow and clear its content.
+            const fundraisersRow = document.getElementById("fundraisersRow");
+            fundraisersRow.innerHTML = "";
+            //Check whether the returned data is empty. If there is no fundraising event, the corresponding prompt message is displayed.
+            if (data.length === 0) {
+              fundraisersRow.innerHTML = "<p>No fundraisers found.</p>";
+              return;
+            }
+
+            data.forEach((fundraiser) => {
+              const fundraiserCard = `
+              <div class="card">
+                <h5>${fundraiser.title}</h5>
+                <p>
+                  <strong>Organizer:</strong> ${fundraiser.organizer} <br>
+                  <strong>City:</strong> ${fundraiser.city} <br>
+                  <strong>Target Funding:</strong> $${fundraiser.target_funding} <br>
+                  <strong>Current Funding:</strong> $${fundraiser.current_funding}
+                </p>
+                <a href="detail.html?id=${fundraiser.fundraiser_id}" class="btn">View Details</a>
+              </div>
+            `;
+              fundraisersRow.innerHTML += fundraiserCard;
+            });
+          })
+          //If any error occurs during the request, print the error message to the console and display the corresponding error message on the page
+          .catch((err) => {
+            console.error("Error fetching fundraisers:", err);
+            document.getElementById("fundraisersRow").innerHTML =
+              "<p>Error fetching fundraisers. Please try again later.</p>";
+          });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fundraiser Details</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f8f0;
+        color: #333;
+        margin: 0;
+        padding: 0;
+      }
+
+      nav {
+        background-color: #4caf50;
+        padding: 15px;
+        text-align: center;
+      }
+
+      nav a {
+        color: white;
+        text-decoration: none;
+        margin: 0 15px;
+        font-size: 18px;
+      }
+
+      nav a:hover {
+        text-decoration: underline;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 30px auto;
+        padding: 20px;
+      }
+
+      .card {
+        background-color: white;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin: 15px;
+        width: 100%;
+        box-sizing: border-box;
+        transition: box-shadow 0.3s ease;
+      }
+
+      h3 {
+        color: #4caf50;
+        font-size: 24px;
+        margin-bottom: 15px;
+      }
+
+      p {
+        font-size: 16px;
+        color: #666;
+        margin-bottom: 10px;
+      }
+
+      .btn {
+        display: inline-block;
+        background-color: #4caf50;
+        color: white;
+        padding: 10px 15px;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 5px;
+        margin-top: 10px;
+        cursor: pointer;
+      }
+
+      .btn:hover {
+        background-color: #388e3c;
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="search.html">Search Fundraisers</a>
+    </nav>
+
+    <div class="container">
+      <div id="fundraiserDetails" class="card">
+        <div class="card-body">
+          <h3 id="fundraiserTitle" class="card-title"></h3>
+          <p id="fundraiserOrganizer" class="card-text"></p>
+          <p id="fundraiserCity" class="card-text"></p>
+          <p id="fundraiserTarget" class="card-text"></p>
+          <p id="fundraiserCurrent" class="card-text"></p>
+          <button id="donateButton" class="btn">Donate</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      //Be sure to execute internal code after the document is fully loaded.
+      document.addEventListener("DOMContentLoaded", function () {
+        //Gets the URL query for the current web page
+        const urlParams = new URLSearchParams(window.location.search);
+        //Extract the ID of the fundraising campaign from the query parameter
+        const fundraiserId = urlParams.get("id");
+        //Check that the fundraiser ID is provided. If not, a warning box pops up and the execution ends.
+        if (!fundraiserId) {
+          alert("No fundraiser ID provided");
+          return;
+        }
+        //Use the Fetch API to send a request for fundraising details
+        fetch(`http://localhost:3333/fundraisers/${fundraiserId}`)
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Network response was not ok");
+            }
+            return response.json();
+          })
+          //After the data is obtained, the elements in the page are updated to display the details of the fundraising campaign
+          .then((data) => {
+            document.getElementById("fundraiserTitle").textContent = data.title;
+            document.getElementById(
+              "fundraiserOrganizer"
+            ).innerHTML = `<strong>Organizer:</strong> ${data.organizer}`;
+            document.getElementById(
+              "fundraiserCity"
+            ).innerHTML = `<strong>City:</strong> ${data.city}`;
+            document.getElementById(
+              "fundraiserTarget"
+            ).innerHTML = `<strong>Target Funding:</strong> $${data.target_funding}`;
+            document.getElementById(
+              "fundraiserCurrent"
+            ).innerHTML = `<strong>Current Funding:</strong> $${data.current_funding}`;
+
+            document
+              .getElementById("donateButton")
+              .addEventListener("click", function () {
+                alert("This feature is under development.");
+              });
+          })
+          //Handles errors that may occur in the Fetch request and prints the error message
+          .catch((err) => {
+            console.error("Error fetching fundraiser details:", err);
+          });
+      });
+    </script>
+  </body>
+</html>

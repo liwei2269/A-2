@@ -73,4 +73,8 @@ app.get('/search', (req, res) => {
     res.json(results);
   });
 });
-
+//Create a RESTful API that allows clients to query crowdfunding campaigns and their details while supporting simple search filtering.
+const PORT = 3333;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
